@@ -18,9 +18,13 @@ namespace BLL.Services
 
         public ServiceBase Create(Movie record)
         {
-            if (_db.Movies.Any(m => m.Name.ToUpper() == record.Name.ToUpper().Trim() &&  m.ReleaseDate== record.ReleaseDate))
-                return Error("Movie with the same name and release date exists!");
+            if (_db.Movies.Any(m => m.Name.ToUpper() == record.Name.ToUpper().Trim() &&  m.ReleaseDate== record.ReleaseDate && m.DirectorId == record.DirectorId))
+                return Error("Movie with the same name, director and release date exists!");
             record.Name = record.Name?.Trim();
+            record.DirectorId = record.DirectorId;
+            record.ReleaseDate = record.ReleaseDate;
+            record.TotalRevenue = record.TotalRevenue;
+            record.Director = record.Director;
             _db.Movies.Add(record);
             _db.SaveChanges();
             return Success("Movie created successfully.");
@@ -31,7 +35,8 @@ namespace BLL.Services
             var entity = _db.Movies.SingleOrDefault(m => m.Id == id);
             if (entity == null)
                 return Error("Movie can't be found!");
-            //_db.MoviesGenres.RemoveRange(entity.MovieGenres);
+           
+            _db.MoviesGenres.RemoveRange(entity.MovieGenres);
             _db.Movies.Remove(entity);
             _db.SaveChanges();
             return Success("Movie deleted successfully.");
@@ -39,19 +44,28 @@ namespace BLL.Services
 
         public IQueryable<MovieModel> Query()
         {
-            return _db.Movies.Include(m => m.Director).OrderByDescending(m => m.ReleaseDate).ThenBy(m => m.Name).Select(m => new MovieModel() { Record = m });
+            return _db.Movies.Include(m => m.Director).Include(m=>m.MovieGenres).ThenInclude(mg=>mg.Genre).OrderByDescending(m => m.ReleaseDate).ThenBy(m => m.Name).Select(m => new MovieModel() { Record = m });
         }
 
         public ServiceBase Update(Movie record)
         {
-
-            if (_db.Movies.Any(m => m.Id != record.Id &&  m.Name.ToUpper() == record.Name.ToUpper().Trim() && m.ReleaseDate == record.ReleaseDate))
+            if (_db.Movies.Any(m => m.Id != record.Id && m.Name.ToUpper() == record.Name.ToUpper().Trim() && m.ReleaseDate == record.ReleaseDate))
                 return Error("Movie with the same name and release date exists!");
-            record.Name = record.Name?.Trim();
-            _db.Movies.Update(record);
+
+            var entity = _db.Movies.Include(m=>m.MovieGenres).SingleOrDefault(m => m.Id == record.Id);
+            if (entity == null)
+                return Error("Movie can't be found!");
+            _db.MoviesGenres.RemoveRange(entity.MovieGenres);
+            entity.Name = record.Name?.Trim();
+            entity.ReleaseDate = record.ReleaseDate;
+            entity.DirectorId = record.DirectorId;
+            entity.Director = record.Director;
+            entity.TotalRevenue = record.TotalRevenue;
+            entity.MovieGenres = record.MovieGenres;
+      
+            _db.Movies.Update(entity);
             _db.SaveChanges();
             return Success("Movie updated successfully.");
         }
-    
     }
 }

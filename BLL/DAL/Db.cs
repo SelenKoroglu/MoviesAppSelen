@@ -17,6 +17,10 @@ namespace BLL.DAL
 
         public DbSet<MovieGenre> MoviesGenres { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Role> Roles { get; set; }
+
         public Db(DbContextOptions options) :base(options) 
         {
         }

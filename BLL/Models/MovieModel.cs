@@ -21,5 +21,16 @@ namespace BLL.Models
         public string TotalRevenue => Record.TotalRevenue.ToString("N0");
 
         public string Director => Record.Director?.Name;
+
+        public string Genres => string.Join("<br>",Record.MovieGenres?.Select(mg => mg.Genre?.Name));
+
+        [DisplayName("Genres")]
+        public List<int> GenreIds
+        {
+            get => Record.MovieGenres?.Select(mg => mg.GenreId).ToList();
+            set => Record.MovieGenres=value.Select(v => new MovieGenre() { GenreId = v}).ToList();
+
+
+        }
     }
 }

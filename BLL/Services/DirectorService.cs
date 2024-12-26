@@ -29,9 +29,11 @@ namespace BLL.Services
 
         public ServiceBase Create(Director record)
         {
-            if (_db.Directors.Any(d => d.Name.ToUpper() == record.Name.ToUpper().Trim()))
-                return Error("Director with the same name exists!");
-            record.Name= record.Name?.Trim();  
+            if (_db.Directors.Any(d => d.Name.ToUpper() == record.Name.ToUpper().Trim() && d.Surname.ToUpper() == record.Surname.ToUpper().Trim() && d.IsRetired == record.IsRetired))
+                return Error("Director with the same name, surname and working status exists!");
+            record.Name= record.Name?.Trim();
+            record.Surname = record.Surname.Trim();
+            record.IsRetired = record.IsRetired;
             _db.Directors.Add(record);
             _db.SaveChanges();
             return Success("Director created successfully.");
@@ -57,12 +59,14 @@ namespace BLL.Services
 
         public ServiceBase Update(Director record)
         {
-            if (_db.Directors.Any(d=> d.Id != record.Id && d.Name.ToUpper() == record.Name.ToUpper().Trim()))
-                return Error("Director with the same name exists!");
+            if (_db.Directors.Any(d=> d.Id != record.Id && d.Name.ToUpper() == record.Name.ToUpper().Trim() && d.Surname.ToUpper() == record.Surname.ToUpper().Trim()))
+                return Error("Director with the same name and surname exists!");
             var entity = _db.Directors.SingleOrDefault(d=> d.Id == record.Id);
             if (entity == null)
                 return Error("Director can't be found!");
-            entity.Name = record.Name?.Trim();  
+            entity.Name = record.Name?.Trim();
+            entity.Surname = record.Surname.Trim();
+            entity.IsRetired = record.IsRetired;
             _db.Directors.Update(entity);
             _db.SaveChanges();
             return Success("Director updated successfully.");

@@ -5,6 +5,7 @@ using BLL.Services;
 using BLL.Models;
 using BLL.Services.Bases;
 using BLL.DAL;
+using Microsoft.AspNetCore.Authorization;
 
 // Generated from Custom Template.
 
@@ -19,22 +20,26 @@ namespace MVC.Controllers
         /* Can be uncommented and used for many to many relationships. ManyToManyRecord may be replaced with the related entiy name in the controller and views. */
         //private readonly IManyToManyRecordService _ManyToManyRecordService;
 
+        private readonly IService<Genre,GenreModel> _genreService; 
+
         public MoviesController(
             IService<Movie, MovieModel> movieService
-            , IDirectorService directorService
-
+            , IDirectorService directorService,
+            IService<Genre, GenreModel> genreService
             /* Can be uncommented and used for many to many relationships. ManyToManyRecord may be replaced with the related entiy name in the controller and views. */
             //, IManyToManyRecordService ManyToManyRecordService
         )
         {
             _movieService = movieService;
             _directorService = directorService;
+            _genreService=genreService;
 
             /* Can be uncommented and used for many to many relationships. ManyToManyRecord may be replaced with the related entiy name in the controller and views. */
             //_ManyToManyRecordService = ManyToManyRecordService;
         }
 
         // GET: Movies
+        [AllowAnonymous]
         public IActionResult Index()
         {
             // Get collection service logic:
@@ -57,9 +62,12 @@ namespace MVC.Controllers
             
             /* Can be uncommented and used for many to many relationships. ManyToManyRecord may be replaced with the related entiy name in the controller and views. */
             //ViewBag.ManyToManyRecordIds = new MultiSelectList(_ManyToManyRecordService.Query().ToList(), "Record.Id", "Name");
+
+            ViewBag.GenreIds= new MultiSelectList(_genreService.Query().ToList(), "Record.Id", "Name");
         }
 
         // GET: Movies/Create
+        [Authorize(Roles ="Admin")]
         public IActionResult Create()
         {
             SetViewData();
@@ -69,6 +77,7 @@ namespace MVC.Controllers
         // POST: Movies/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(MovieModel movie)
         {
             if (ModelState.IsValid)
@@ -87,6 +96,7 @@ namespace MVC.Controllers
         }
 
         // GET: Movies/Edit/5
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             // Get item to edit service logic:
@@ -98,6 +108,7 @@ namespace MVC.Controllers
         // POST: Movies/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(MovieModel movie)
         {
             if (ModelState.IsValid)
@@ -116,6 +127,7 @@ namespace MVC.Controllers
         }
 
         // GET: Movies/Delete/5
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             // Get item to delete service logic:
@@ -126,6 +138,7 @@ namespace MVC.Controllers
         // POST: Movies/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteConfirmed(int id)
         {
             // Delete item service logic:

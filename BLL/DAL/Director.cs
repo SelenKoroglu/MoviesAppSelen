@@ -14,7 +14,7 @@ namespace BLL.DAL
         [Required]
         [StringLength(70)]
         public string Name { get; set; }
-
+        [Required]
         public string Surname { get; set; }
 
         public bool IsRetired { get; set; }
