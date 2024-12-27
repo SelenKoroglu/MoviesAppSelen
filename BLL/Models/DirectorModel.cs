@@ -19,5 +19,7 @@ namespace BLL.Models
 
         [DisplayName("Working Status")]
         public string IsRetired => Record.IsRetired ? "Retired" : "Not Retired";
+
+        public string FullName => $"{Record.Name} {Record.Surname}";
     }
 }

@@ -18,9 +18,10 @@ namespace BLL.Models
         public string ReleaseDate => Record.ReleaseDate is null ? string.Empty : Record.ReleaseDate.Value.ToString("MM/dd/yyyy");
 
         [DisplayName("Total Revenue")]
-        public string TotalRevenue => Record.TotalRevenue.ToString("N0");
+        public string TotalRevenue => Record.TotalRevenue.ToString("C2");
 
-        public string Director => Record.Director?.Name;
+        //public string Director => Record.Director?.Name;
+        public string Director => $"{Record.Director?.Name} {Record.Director?.Surname}".Trim();
 
         public string Genres => string.Join("<br>",Record.MovieGenres?.Select(mg => mg.Genre?.Name));
 
